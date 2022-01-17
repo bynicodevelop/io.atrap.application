@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Header() {
   return (
     <header>
@@ -16,12 +18,11 @@ export default function Header() {
                       Menu 1
                     </a>
 
-                    <a
-                      href="#"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Menu 2
-                    </a>
+                    <Link href="/auth">
+                      <a className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        Login
+                      </a>
+                    </Link>
                   </div>
                 </div>
               </div>
