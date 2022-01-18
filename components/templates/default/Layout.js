@@ -1,6 +1,8 @@
 import Head from "next/head";
+import CookieBanner from "./CookieBanner";
 import Footer from "./Footer";
 import Header from "./Header";
+import Notice from "./Notice";
 
 export default function Layout({ children }) {
   return (
@@ -14,6 +16,10 @@ export default function Layout({ children }) {
       <Header />
 
       <main className="container">{children}</main>
+
+      <Notice />
+
+      <CookieBanner />
 
       <Footer />
     </>

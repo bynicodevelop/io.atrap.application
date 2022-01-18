@@ -1,15 +1,15 @@
-import AuthenticationComponent from "../components/AuthenticationComponent";
+import AuthUserProvider from "../contexts/AuthUserProvider";
 import Layout from "../components/templates/default/Layout";
 import "../styles/globals.css";
 
-function MyApp({ Component, pageProps }) {
+function App({ Component, pageProps }) {
   return (
-    <AuthenticationComponent>
+    <AuthUserProvider>
       <Layout>
         <Component {...pageProps} />
       </Layout>
-    </AuthenticationComponent>
+    </AuthUserProvider>
   );
 }
 
-export default MyApp;
+export default App;

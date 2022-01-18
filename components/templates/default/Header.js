@@ -1,6 +1,22 @@
 import Link from "next/link";
 
+import { useAuth } from "../../../contexts/AuthUserProvider";
+import DefaultButton from "./DefaultButton";
+
 export default function Header() {
+  const { authUser, logout } = useAuth();
+
+  const signOut = async () => {
+    await logout();
+  };
+
+  const button =
+    authUser == null ? (
+      <DefaultButton label="Login" to="/auth" />
+    ) : (
+      <DefaultButton label="Logout" onClick={signOut} />
+    );
+
   return (
     <header>
       <nav className="bg-gray-800">
@@ -10,19 +26,9 @@ export default function Header() {
               <div className="flex-1 flex items-center justify-center items-stretch justify-start">
                 <div className="block sm:ml-6">
                   <div className="flex space-x-4">
-                    <a
-                      href="#"
-                      className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
-                      aria-current="page"
-                    >
-                      Menu 1
-                    </a>
+                    <DefaultButton label="Buttonn 1" />
 
-                    <Link href="/auth">
-                      <a className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                        Login
-                      </a>
-                    </Link>
+                    {button}
                   </div>
                 </div>
               </div>

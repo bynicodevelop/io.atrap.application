@@ -1,14 +1,25 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
-import { auth } from "../../utils/firebase";
-import { sendSignInLinkToEmail } from "firebase/auth";
+import DefaultButton from "../../components/templates/default/DefaultButton";
+import { useAuth } from "../../contexts/AuthUserProvider";
+import { alertServices } from "../../lib/notificationService";
 
 export default function Auth() {
+  const { sendEmailLink, authUser } = useAuth();
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState({});
   const [loading, setLoading] = useState(false);
   const [valid, setValid] = useState(false);
+
+  useEffect(() => {
+    if (authUser != null) {
+      router.push("/");
+    }
+  });
 
   const emailValidator = yup.object().shape({
     email: yup.string().email().required(),
@@ -19,24 +30,30 @@ export default function Auth() {
 
     setLoading(true);
 
-    const resultValidation = emailValidator.validate({ email });
-
     setError({});
 
-    if (!resultValidation) {
+    try {
+      const resultValidation = await emailValidator.validate({ email });
+
+      if (!resultValidation) {
+        throw new Error("Invalid email");
+      }
+
+      await sendEmailLink(email);
+
+      alertServices.onSuccess(
+        "Il reste une dernière étape...",
+        "Vous allez recevoir un email de confirmation pour finaliser votre inscription/connexion"
+      );
+
+      setTimeout(() => {
+        alertServices.clear();
+      }, 3000);
+    } catch (error) {
       setError({
         email: "Merci de renseigner votre email",
       });
-
-      return;
     }
-
-    const actionCodeSettings = {
-      url: `http://localhost:3000/auth?email=${email}`,
-      handleCodeInApp: true,
-    };
-
-    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
 
     setLoading(false);
   };
@@ -56,20 +73,12 @@ export default function Auth() {
         <div className="w-full max-w-xs">
           <form
             onSubmit={onSubmit}
-            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+            className="bg-white md:px-10 pt-8 md:py-8 md:rounded-xl md:shadow-lg"
           >
-            <h1 className="w-full text-center mb-4 text-gray-700 font-bold">
-              Login
-            </h1>
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 text-sm font-bold mb-2"
-                htmlFor="username"
-              >
-                Email
-              </label>
+            <h1 className="w-full mb-4 text-gray-700 font-bold">Login</h1>
+            <div className="mb-2">
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="bg-gray-100 px-4 py-4 outline-none rounded-md w-full"
                 id="email"
                 placeholder="E-mail"
                 value={email}
@@ -78,17 +87,13 @@ export default function Auth() {
               <p className="text-red-500 text-xs italic py-2">{error.email}</p>
             </div>
             <div className="flex items-center justify-between">
-              <button
+              <DefaultButton
                 disabled={loading || !valid}
-                className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                  loading || !valid
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer"
-                }`}
+                label="Se connecter"
+                selected="true"
+                className={`w-full text-lg py-3 text-center`}
                 type="submit"
-              >
-                Sign In
-              </button>
+              />
             </div>
           </form>
         </div>
